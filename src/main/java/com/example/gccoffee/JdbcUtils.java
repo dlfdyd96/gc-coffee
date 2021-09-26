@@ -12,6 +12,6 @@ public class JdbcUtils {
     }
 
     public static LocalDateTime toLocalDateTime(Timestamp timestamp) {
-        return timestamp == null ? timestamp.toLocalDateTime() : null;
+        return timestamp != null ? timestamp.toLocalDateTime() : null;
     }
 }

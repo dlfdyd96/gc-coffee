@@ -16,6 +16,19 @@ class EmailTest {
     @Test
     public void testValidEmail() {
         var email = new Email("qwer@naver.com");
-        assertTrue(email.getAddress().equals("qwer@naver.com"));
+        assertEquals("qwer@naver.com", email.getAddress());
     }
+
+
+
+    @Test
+    public void testEqEmail() {
+        var email = new Email("qwer@naver.com");
+        var email2 = new Email("qwer@naver.com");
+        assertEquals("qwer@naver.com", email);
+    }
+
+
+
+
 }

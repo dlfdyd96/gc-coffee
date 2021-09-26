@@ -55,7 +55,7 @@ public class Product {
         return createdAt;
     }
 
-    public LocalDateTime getUpdatedAt() {
+    public LocalDateT me getUpdatedAt() {
         return updatedAt;
     }
 

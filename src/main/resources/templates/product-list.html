@@ -28,6 +28,7 @@
         <th scope="col">CreatedAt</th>
         <th scope="col">UpdatedAt</th>
         <th scope="col">Detail</th>
+        <th scope="col">Delete</th>
     </tr>
     </thead>
     <tbody>
@@ -40,8 +41,14 @@
         <td th:text="*{createdAt}"></td>
         <td th:text="*{updatedAt}"></td>
         <td>
-            <a th:href="@{/product/{productId}(productId=*{productId})}" class="btn btn-primary me-md-2" type="button">자세히</a>
+            <a th:href="@{/products/{productId}(productId=*{productId})}" class="btn btn-primary me-md-2" type="button">자세히</a>
         </td>
+        <td>
+            <form th:action="@{/products/{productId}(productId=*{productId})}" th:method="delete">
+                <button class="btn btn-danger me-md-2" type="submit">x</button>
+            </form>
+        </td>
+
 
     </tr>
     </tbody>

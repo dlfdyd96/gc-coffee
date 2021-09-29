@@ -1,15 +1,16 @@
 package com.example.gccoffee.repository;
 
-import com.example.gccoffee.model.Order;
-import com.example.gccoffee.model.OrderItem;
+import com.example.gccoffee.model.*;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
+
+import static com.example.gccoffee.JdbcUtils.toLocalDateTime;
+import static com.example.gccoffee.JdbcUtils.toUUID;
 
 @Repository
 public class OrderJdbcRepository implements OrderRepository {
@@ -32,6 +33,30 @@ public class OrderJdbcRepository implements OrderRepository {
                                         " VALUES (UUID_TO_BIN(:orderId), UUID_TO_BIN(:productId), :category, :price, :quantity, :createdAt, :updatedAt)",
                                 toOrderItemParamMap(order.getOrderId(), order.getCreatedAt(), order.getUpdatedAt(), item)));
         return null;
+    }
+
+    @Override
+    public List<Order> findAll() {
+        var orders = jdbcTemplate.query("SELECT * FROM orders", orderRowMapper);
+        orders.forEach(item -> {
+
+        });
+        return null;
+    }
+
+    @Override
+    public Optional<Order> findById(UUID orderId) {
+        return Optional.empty();
+    }
+
+    @Override
+    public void deleteAll() {
+
+    }
+
+    @Override
+    public void deleteById(UUID orderId) {
+
     }
 
     private Map<String, Object> toOrderParamMap(Order order) {
@@ -58,5 +83,17 @@ public class OrderJdbcRepository implements OrderRepository {
         return paramMap;
     }
 
-    // TODO: 조회는 알아서.
+    private static final RowMapper<Order> orderRowMapper = (resultSet, i) -> {
+        var orderId = toUUID(resultSet.getBytes("order_id"));
+        var email = new Email(resultSet.getString("email"));
+        var address = resultSet.getString("address");
+        var postcode = resultSet.getString("postcode");
+        // var orderItems = resultSet.get;
+        var orderStatus = OrderStatus.valueOf(resultSet.getString("order_status"));
+        var createdAt = toLocalDateTime(resultSet.getTimestamp("created_at"));
+        var updatedAt = toLocalDateTime(resultSet.getTimestamp("updated_at"));
+        var orderItems = new ArrayList<OrderItem>();
+
+        return new Order(orderId, email, address, postcode, orderItems, orderStatus, createdAt, updatedAt);
+    };
 }

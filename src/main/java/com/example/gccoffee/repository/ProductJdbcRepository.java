@@ -2,10 +2,13 @@ package com.example.gccoffee.repository;
 
 import com.example.gccoffee.model.Category;
 import com.example.gccoffee.model.Product;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
@@ -14,6 +17,7 @@ import static com.example.gccoffee.JdbcUtils.toUUID;
 
 @Repository
 public class ProductJdbcRepository implements ProductRepository {
+    private static final Logger log = LoggerFactory.getLogger(ProductJdbcRepository.class);
 
     private final NamedParameterJdbcTemplate jdbcTemplate;
 
@@ -40,7 +44,7 @@ public class ProductJdbcRepository implements ProductRepository {
     public Product update(Product product) {
         var update = jdbcTemplate.update(
                 "UPDATE products SET product_name = :productName, category = :category, price = :price, description = :description, created_at = :createdAt, updated_at = :updatedAt " +
-                " WHERE product_id = UUID_TO_BIN(:productId)",
+                        " WHERE product_id = UUID_TO_BIN(:productId)",
                 toParamMap(product));
         if (update != 1) {
             throw new RuntimeException("Nothing was updated"); // TODO: 적절한 예외처리 생각해보기
@@ -80,6 +84,16 @@ public class ProductJdbcRepository implements ProductRepository {
                 "SELECT * FROM products WHERE category = :category",
                 Collections.singletonMap("category", category.toString()),
                 productRowMapper
+        );
+    }
+
+    @Override
+    @Transactional
+    public void deleteById(UUID productId) {
+        log.info("delete uuid: {}", productId.toString());
+        jdbcTemplate.update(
+                "DELETE FROM products WHERE product_id = UUID_TO_BIN(:productId)",
+                Collections.singletonMap("productId", productId.toString().getBytes())
         );
     }
 

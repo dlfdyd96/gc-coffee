@@ -76,4 +76,6 @@ public class Order {
         this.updatedAt = updatedAt;
         this.updatedAt = LocalDateTime.now();
     }
+
+    // TODO: How to set OrdrItems?
 }

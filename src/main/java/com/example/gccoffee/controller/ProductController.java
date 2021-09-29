@@ -10,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.MessageFormat;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -36,10 +37,15 @@ public class ProductController {
         return "new-product";
     }
 
-    @GetMapping("/product/{id}")
+    @GetMapping("/products/{id}")
     public String productDetail(@PathVariable("id") UUID uuid, Model model) {
-        var product = productService.getProductById(uuid).get(); // TODO: not found 예외 처리
-        model.addAttribute("product", product);
+        productService.getProductById(uuid).ifPresentOrElse(product -> {
+            model.addAttribute("product", product);
+        }, () -> {
+            throw new IllegalArgumentException(
+                    MessageFormat.format("Can't find '{}' product ", uuid.toString())
+            );
+        });
         return "product-detail";
     }
 
@@ -62,6 +68,14 @@ public class ProductController {
                 updateProductRequest.category(),
                 updateProductRequest.price(),
                 updateProductRequest.description());
+
+        return "redirect:/products";
+    }
+
+    @DeleteMapping("/products/{id}")
+    public String deleteProduct(@PathVariable("id") UUID uuid) { // TODO: Not Found Exception?
+        log.info("delete uuid: {}", uuid);
+        productService.deleteProduct(uuid);
         return "redirect:/products";
     }
 }

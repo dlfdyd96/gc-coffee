@@ -26,12 +26,31 @@ Coffee Bean Package를 온라인 웹 사이트로 주문을 할 수 있는 커�
 - 관리자 페이지 제공
 - REST API도 제공을하여 Web Application으로 부터 요청을 응답
 
-프로젝트 환경
+## Database
+
+![](./images/database_diagram.png)
+
+- product
+- Order
+- OrderItem
+
+## Spring Application
+
+### 프로젝트 환경
 
 - Java 17
 - Spring Boot
 - MySQL
 - Thymeleaf
+
+### 프로젝트 구성
+
+![](./images/spring_application_diagram.png)
+
+- Controller :
+- Service :
+- Repository : 
+
 
 ### GC Coffee Client Page
 

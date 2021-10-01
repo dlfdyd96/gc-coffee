@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+
+    <title>Grids & Circles</title>
+</head>
+<body class="container-fluid">
+<h1>Grids & Circles</h1>
+<h2>Order Management</h2>
+<table class="table table-hover table-striped">
+    <thead>
+    <tr>
+        <th scope="col">Id</th>
+        <th scope="col">Email</th>
+        <th scope="col">Address</th>
+        <th scope="col">Postcode</th>
+        <th scope="col">orderStatus</th>
+        <th scope="col">createdAt</th>
+        <th scope="col">updatedAt</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="order : ${orders}" th:object="${order}">
+<!--            <td th:text="*{orderId}" th:onClick="location.href=*{'/products/' + orderId}"></td>-->
+        <td>
+            <a th:href="@{/orders/{orderId}(orderId=*{orderId})}" th:text="*{orderId}"></a>
+        </td>
+        <td th:text="*{email.getAddress()}"></td>
+        <td th:text="*{address}"></td>
+        <td th:text="*{postcode}"></td>
+        <td th:text="*{orderStatus}"></td>
+        <td th:text="*{createdAt}"></td>
+        <td th:text="*{updatedAt}"></td>
+        <!--        <td>-->
+        <!--            <a th:href="@{/products/{productId}(productId=*{productId})}" class="btn btn-primary me-md-2" type="button">자세히</a>-->
+        <!--        </td>-->
+        <!--        <td>-->
+        <!--            <form th:action="@{/products/{productId}(productId=*{productId})}" th:method="delete">-->
+        <!--                <button class="btn btn-danger me-md-2" type="submit">x</button>-->
+        <!--            </form>-->
+        <!--        </td>-->
+
+
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>

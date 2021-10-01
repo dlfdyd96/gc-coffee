@@ -1,6 +1,9 @@
 package com.example.gccoffee.repository;
 
 import com.example.gccoffee.model.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -14,11 +17,15 @@ import static com.example.gccoffee.JdbcUtils.toUUID;
 
 @Repository
 public class OrderJdbcRepository implements OrderRepository {
+    private static final Logger log = LoggerFactory.getLogger(OrderJdbcRepository.class);
 
     private final NamedParameterJdbcTemplate jdbcTemplate;
 
-    public OrderJdbcRepository(NamedParameterJdbcTemplate jdbcTemplate) {
+    private final OrderItemsJdbcRepository orderItemRepository;
+
+    public OrderJdbcRepository(NamedParameterJdbcTemplate jdbcTemplate, OrderItemsJdbcRepository orderItemRepository) {
         this.jdbcTemplate = jdbcTemplate;
+        this.orderItemRepository = orderItemRepository;
     }
 
     @Override
@@ -36,27 +43,51 @@ public class OrderJdbcRepository implements OrderRepository {
     }
 
     @Override
+    public Order update(Order order) {
+        log.info("order : {}", order.toString());
+        var update = jdbcTemplate.update(
+                "UPDATE orders SET email = :email, address = :address, postcode = :postcode, order_status = :orderStatus, created_at = :createdAt, updated_at = :updatedAt" +
+                " WHERE order_id = UUID_TO_BIN(:orderId)",
+                toOrderParamMap(order));
+        if (update != 1) {
+            throw new RuntimeException("Nothing was updated"); // TODO: 적절한 예외처리 생각해보기
+        }
+        return order;
+    }
+
+    @Override
+    @Transactional
     public List<Order> findAll() {
         var orders = jdbcTemplate.query("SELECT * FROM orders", orderRowMapper);
-        orders.forEach(item -> {
-
+        orders.forEach(order -> {
+            List<OrderItem> orderItems = orderItemRepository.findByOrderId(order.getOrderId());
+            order.setOrderItems(orderItems);
         });
-        return null;
+        return orders;
     }
 
     @Override
+    @Transactional
     public Optional<Order> findById(UUID orderId) {
-        return Optional.empty();
+        try {
+            var order = jdbcTemplate.queryForObject(
+                    "SELECT * FROM orders WHERE order_id = UUID_TO_BIN(:orderId)",
+                    Collections.singletonMap("orderId", orderId.toString().getBytes()),
+                    orderRowMapper);
+            order.setOrderItems(orderItemRepository.findByOrderId(order.getOrderId()));
+            return Optional.of(order);
+        } catch (EmptyResultDataAccessException e) {
+            return Optional.empty();
+        }
     }
 
     @Override
-    public void deleteAll() {
-
-    }
-
-    @Override
-    public void deleteById(UUID orderId) {
-
+    public List<Order> findByOrderStatus(OrderStatus orderStatus) {
+        return jdbcTemplate.query(
+                "SELECT * FROM orders WHERE order_status = :orderStatus",
+                Collections.singletonMap("orderStatus", orderStatus.toString()),
+                orderRowMapper
+        );
     }
 
     private Map<String, Object> toOrderParamMap(Order order) {

@@ -1,6 +1,7 @@
 package com.example.gccoffee.model;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -9,7 +10,8 @@ public class Order {
     private final Email email;
     private String address;
     private String postcode;
-    private final List<OrderItem> orderItems;
+
+    private List<OrderItem> orderItems;
     private OrderStatus orderStatus;
     private final LocalDateTime createdAt;
     private LocalDateTime updatedAt;
@@ -77,5 +79,7 @@ public class Order {
         this.updatedAt = LocalDateTime.now();
     }
 
-    // TODO: How to set OrdrItems?
+    public void setOrderItems(List<OrderItem> orderItems) {
+        this.orderItems = orderItems;
+    }
 }
